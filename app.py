@@ -20,8 +20,7 @@ DB_USER = os.environ.get("DB_USER", "root")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
 DB_NAME = os.environ.get("DB_NAME", "cybersecurity_db")
 DB_PORT = int(os.environ.get("DB_PORT", 3306))
-DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cybersecurity.db")
-
+DB_FILE = DB_FILE = os.environ.get("DB_FILE", os.path.join("/tmp", "cybersecurity.db"))
 class SQLiteCursorWrapper:
     def __init__(self, cursor):
         self._cursor = cursor
@@ -132,6 +131,8 @@ def init_db():
 
 # Initialize schema on startup
 init_db()
+except Exception as e:
+    print(f"[CyberGuard] Startup DB init skipped: {e}")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
