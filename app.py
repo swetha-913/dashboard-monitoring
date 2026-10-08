@@ -19,8 +19,8 @@ DB_HOST = os.environ.get("DB_HOST")
 DB_USER = os.environ.get("DB_USER", "root")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
 DB_NAME = os.environ.get("DB_NAME", "cybersecurity_db")
-DB_PORT = int(os.environ.get("DB_PORT", 3306))
-DB_FILE = DB_FILE = os.environ.get("DB_FILE", os.path.join("/tmp", "cybersecurity.db"))
+default_db_dir = "/tmp" if os.path.isdir("/tmp") else os.path.dirname(os.path.abspath(__file__))
+DB_FILE = os.environ.get("DB_FILE", os.path.join(default_db_dir, "cybersecurity.db"))
 class SQLiteCursorWrapper:
     def __init__(self, cursor):
         self._cursor = cursor
@@ -130,7 +130,8 @@ def init_db():
         print(f"[CyberGuard Warning] Database initialization: {e}")
 
 # Initialize schema on startup
-init_db()
+try:
+    init_db()
 except Exception as e:
     print(f"[CyberGuard] Startup DB init skipped: {e}")
 
