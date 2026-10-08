@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberGuard Security Operations - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-body">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="shield-badge">
+                    <span class="shield-icon">🛡️</span>
+                </div>
+                <h1>CyberGuard</h1>
+                <p class="subtitle">Security Operations Command Center</p>
+            </div>
+
+            {% if error %}
+            <div class="error-banner">
+                <span class="error-icon">⚠️</span>
+                <div>{{ error }}</div>
+            </div>
+            {% endif %}
+
+            <form method="POST" class="login-form">
+                <div class="form-group">
+                    <label for="username">Operator ID / Username</label>
+                    <div class="input-with-icon">
+                        <span class="icon">👤</span>
+                        <input type="text" id="username" name="username" placeholder="admin" required autofocus value="admin">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Security Clearance Key / Password</label>
+                    <div class="input-with-icon">
+                        <span class="icon">🔒</span>
+                        <input type="password" id="password" name="password" placeholder="admin123" required value="admin123">
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn login-btn">
+                    <span>Authenticate & Access Terminal</span>
+                    <span class="arrow">→</span>
+                </button>
+            </form>
+
+            <div class="demo-credentials-box">
+                <div class="demo-title">🔑 Live Demo Access Credentials</div>
+                <div class="demo-creds">
+                    <span>Username: <strong>admin</strong></span>
+                    <span>Password: <strong>admin123</strong></span>
+                </div>
+                <div class="demo-hint">Pre-filled for rapid evaluation on Render live hosting.</div>
+            </div>
+
+            <div class="system-footer">
+                <span class="pulse-dot"></span>
+                <span>SOC Telemetry Active • Protected by AES-256</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

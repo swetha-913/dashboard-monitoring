@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Security Incident #{{ threat.id }} - CyberGuard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="form-page-body">
+
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="header-icon">✏️</div>
+            <div>
+                <h1>Modify Incident #{{ threat.id }}</h1>
+                <p>Update incident severity, containment status, or forensic notes</p>
+            </div>
+        </div>
+
+        <form method="POST" class="incident-form">
+            <div class="form-group">
+                <label for="threat_type">Threat Vector / Incident Type</label>
+                <input type="text"
+                       id="threat_type"
+                       name="threat_type"
+                       value="{{ threat.threat_type }}"
+                       required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="severity">Severity Classification</label>
+                    <select id="severity" name="severity" required>
+                        <option value="Critical" {% if threat.severity == 'Critical' %}selected{% endif %}>Critical (Immediate Hazard)</option>
+                        <option value="High" {% if threat.severity == 'High' %}selected{% endif %}>High (Elevated Risk)</option>
+                        <option value="Medium" {% if threat.severity == 'Medium' %}selected{% endif %}>Medium (Moderate Impact)</option>
+                        <option value="Low" {% if threat.severity == 'Low' %}selected{% endif %}>Low (Informational / Probe)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Containment Status</label>
+                    <select id="status" name="status" required>
+                        <option value="Open" {% if threat.status == 'Open' %}selected{% endif %}>Open (Needs Triage)</option>
+                        <option value="Investigating" {% if threat.status == 'Investigating' %}selected{% endif %}>Investigating (Under Analysis)</option>
+                        <option value="Resolved" {% if threat.status == 'Resolved' %}selected{% endif %}>Resolved (Contained)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Incident Description & Forensic Details</label>
+                <textarea id="description"
+                          name="description"
+                          rows="4"
+                          required>{{ threat.description }}</textarea>
+            </div>
+
+            <div class="form-actions">
+                <a href="/" class="btn btn-secondary">← Cancel & Back</a>
+                <button type="submit" class="btn btn-primary">
+                    <span>💾 Update Incident Details</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

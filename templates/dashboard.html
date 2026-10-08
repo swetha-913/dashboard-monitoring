@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberGuard SOC - Live Threat Monitoring</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="layout-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">🛡️</div>
+            <div class="brand-text">
+                <h2>CyberGuard</h2>
+                <span class="brand-tag">SOC DASHBOARD</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item active">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/add-threat" class="nav-item">
+                <span class="nav-icon">➕</span>
+                <span>Add Threat</span>
+            </a>
+            <a href="#threats-table" class="nav-item">
+                <span class="nav-icon">🚨</span>
+                <span>Threat Feed</span>
+            </a>
+            <div class="nav-divider"></div>
+            <a href="/logout" class="nav-item logout-nav">
+                <span class="nav-icon">🚪</span>
+                <span>Sign Out</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="status-indicator">
+                <span class="pulse-beacon"></span>
+                <span>Render Live Node: <strong>ONLINE</strong></span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Security Operations Monitoring</h1>
+                <p>Enterprise Incident Response & Real-Time Threat Intelligence</p>
+            </div>
+
+            <div class="topbar-actions">
+                <a href="/add-threat" class="btn btn-primary">
+                    <span>+ Log New Threat</span>
+                </a>
+
+                <div class="user-pill">
+                    <div class="user-avatar">AD</div>
+                    <div class="user-details">
+                        <span class="user-role">SecOps Admin</span>
+                        <span class="user-status">Clearance Level 5</span>
+                    </div>
+                    <a href="/logout" class="quick-logout" title="Log out">⏻</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- CRITICAL ALERT BANNER -->
+        {% if latest_alert %}
+        <div class="security-alert-banner">
+            <div class="alert-icon-wrap">
+                <span class="pulsing-warning">🚨</span>
+            </div>
+            <div class="alert-content">
+                <div class="alert-header">
+                    <strong>CRITICAL SECURITY INCIDENT DETECTED</strong>
+                    <span class="alert-badge">{{ latest_alert.threat_type }}</span>
+                </div>
+                <p class="alert-desc">{{ latest_alert.description }}</p>
+                <div class="alert-meta">
+                    <span>Status: <strong>{{ latest_alert.status }}</strong></span>
+                    <span>•</span>
+                    <span>Logged At: {{ latest_alert.detected_at }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- KPI METRICS GRID -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-label">Total Detected Incidents</span>
+                    <span class="stat-badge blue">TOTAL</span>
+                </div>
+                <div class="stat-value">{{ total }}</div>
+                <div class="stat-footer">
+                    <span class="stat-indicator">📊 All logged records</span>
+                </div>
+            </div>
+
+            <div class="stat-card critical">
+                <div class="stat-top">
+                    <span class="stat-label">Critical Severity</span>
+                    <span class="stat-badge red">URGENT</span>
+                </div>
+                <div class="stat-value text-red">{{ critical }}</div>
+                <div class="stat-footer">
+                    <span class="stat-indicator text-red">Requires immediate triage</span>
+                </div>
+            </div>
+
+            <div class="stat-card warning">
+                <div class="stat-top">
+                    <span class="stat-label">Open Incidents</span>
+                    <span class="stat-badge amber">ACTIVE</span>
+                </div>
+                <div class="stat-value text-amber">{{ open_threats }}</div>
+                <div class="stat-footer">
+                    <span class="stat-indicator text-amber">Active investigations</span>
+                </div>
+            </div>
+
+            <div class="stat-card safe">
+                <div class="stat-top">
+                    <span class="stat-label">Resolved & Mitigated</span>
+                    <span class="stat-badge green">SAFE</span>
+                </div>
+                <div class="stat-value text-green">{{ resolved }}</div>
+                <div class="stat-footer">
+                    <span class="stat-indicator text-green">Successfully contained</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- TABLE SECTION -->
+        <section class="panel threats-panel" id="threats-table">
+            <div class="panel-header">
+                <div>
+                    <h2>Live Security Event Stream</h2>
+                    <p class="panel-subtitle">Audited security events stored in database</p>
+                </div>
+
+                <div class="filter-controls">
+                    <div class="search-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="searchInput" placeholder="Search threats, IPs, descriptions...">
+                    </div>
+
+                    <select id="severityFilter" class="select-filter">
+                        <option value="All">All Severities</option>
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="threats-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">ID</th>
+                            <th>Threat Type</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Incident Description</th>
+                            <th>Timestamp</th>
+                            <th style="text-align: right; width: 140px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="threatsTbody">
+                        {% for threat in threats %}
+                        <tr class="threat-row">
+                            <td class="mono-id">#{{ threat.id }}</td>
+                            <td>
+                                <strong class="threat-name">{{ threat.threat_type }}</strong>
+                            </td>
+                            <td>
+                                {% if threat.severity == "Critical" %}
+                                    <span class="badge badge-critical">CRITICAL</span>
+                                {% elif threat.severity == "High" %}
+                                    <span class="badge badge-high">HIGH</span>
+                                {% elif threat.severity == "Medium" %}
+                                    <span class="badge badge-medium">MEDIUM</span>
+                                {% else %}
+                                    <span class="badge badge-low">LOW</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if threat.status == "Open" %}
+                                    <span class="status-pill status-open">● Open</span>
+                                {% elif threat.status == "Investigating" %}
+                                    <span class="status-pill status-investigating">⚡ Investigating</span>
+                                {% else %}
+                                    <span class="status-pill status-resolved">✓ Resolved</span>
+                                {% endif %}
+                            </td>
+                            <td class="threat-desc">{{ threat.description }}</td>
+                            <td class="mono-date">{{ threat.detected_at }}</td>
+                            <td style="text-align: right;">
+                                <div class="action-buttons">
+                                    <a href="/edit-threat/{{ threat.id }}" class="action-btn edit-btn" title="Edit Incident">
+                                        ✏️ Edit
+                                    </a>
+                                    <a href="/delete-threat/{{ threat.id }}" class="action-btn delete-btn" onclick="return confirm('Confirm deletion of threat #{{ threat.id }}?')" title="Delete Incident">
+                                        🗑️
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                No security incidents logged yet. Click "+ Log New Threat" to add one.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+const searchInput = document.getElementById("searchInput");
+const severityFilter = document.getElementById("severityFilter");
+const tbody = document.getElementById("threatsTbody");
+
+function filterThreats() {
+    const searchText = searchInput.value.toLowerCase().trim();
+    const severity = severityFilter.value;
+    const rows = tbody.querySelectorAll("tr.threat-row");
+
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const severityBadge = row.querySelector(".badge");
+        const severityText = severityBadge ? severityBadge.innerText.trim() : "";
+
+        const matchesSearch = text.includes(searchText);
+        const matchesSeverity = (severity === "All") || (severityText.toUpperCase() === severity.toUpperCase());
+
+        row.style.display = matchesSearch && matchesSeverity ? "" : "none";
+    });
+}
+
+searchInput.addEventListener("input", filterThreats);
+severityFilter.addEventListener("change", filterThreats);
+</script>
+
+</body>
+</html>
