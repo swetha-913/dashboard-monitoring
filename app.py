@@ -19,6 +19,7 @@ DB_HOST = os.environ.get("DB_HOST")
 DB_USER = os.environ.get("DB_USER", "root")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
 DB_NAME = os.environ.get("DB_NAME", "cybersecurity_db")
+DB_PORT = int(os.environ.get("DB_PORT", 3306))
 default_db_dir = "/tmp" if os.path.isdir("/tmp") else os.path.dirname(os.path.abspath(__file__))
 DB_FILE = os.environ.get("DB_FILE", os.path.join(default_db_dir, "cybersecurity.db"))
 class SQLiteCursorWrapper:
